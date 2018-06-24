@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "devniel",
+      "authorEmail": "dnielfs@gmail.com",
+      "authorUrl": "http://devniel.com"
+    }
+  }
+}
