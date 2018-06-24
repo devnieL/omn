@@ -1,19 +1,6 @@
-# dormi [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> An ORM module.
+# omn [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+> An object mapping tool.
 
-## Installation
-
-```sh
-$ npm install --save dormi
-```
-
-## Usage
-
-```js
-const dormi = require('dormi');
-
-dormi('Rainbow');
-```
 ## License
 
 MIT © [devniel](http://devniel.com)
