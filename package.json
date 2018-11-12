@@ -12,6 +12,10 @@
   "main": "lib/index.js",
   "keywords": [""],
   "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.5",
+    "@babel/preset-env": "^7.1.5",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.5",
     "babel-jest": "^23.6.0",
@@ -40,7 +44,8 @@
     "prepublishOnly": "nsp check",
     "pretest": "eslint .",
     "precommit": "lint-staged",
-    "test": "jest"
+    "test": "jest",
+    "build": "babel src -d lib"
   },
   "lint-staged": {
     "*.js": ["eslint --fix", "git add"],
