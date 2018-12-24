@@ -1,45 +1,88 @@
-const assert = require('assert');
-var neo4j = require('neo4j-driver');
+import mongoose from 'mongoose';
+import Post from './entities/Post.js';
+import DB from '../DB';
 
-describe('Model', () => {
+const DB_NAME = "MongoDB";
 
-  it('should create an instance of Model', () => {
+describe('Entity', () => {
 
-    const DB = require("../index.js").DB;
+  beforeAll(async () => {
 
     DB.configure({
-      db : {
-        type : "neo4j",
-        client : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', 'neo4j'))
+      db: {
+        type: "mongodb",
+        client: await mongoose.connect("mongodb://localhost:27017/omn", {
+          autoReconnect: true,
+          socketTimeoutMS: 300000,
+          connectTimeoutMS: 300000,
+          keepAlive: true,
+          reconnectTries: 30,
+          reconnectInterval: 3000,
+        })
       }
     });
 
-    const Entity = require('../index.js').Entity;
+  });
 
-    class Braph extends Entity {
-      static get schema(){
-        return {
-          name : {
-            type : String,
-            null : false,
-            default : "A new Braph"
-          },
-          active : Boolean,
-          creation_date : Date,
-          update_date : Date,
-          global : Boolean
-        }
-      }
-    }
+  it(`should save an instance of Entity with ${DB_NAME} as a database`, async () => {
 
-    var braph = new Braph({
-      name : "An example",
-      active : true,
-      creation_date : new Date(),
-      global : true
+    const post = new Post({
+      title: "A post",
+      content: "Lorem ipsum dolor sit amet",
+      creation_date: (new Date()).toISOString(),
+      update_date: new Date().toISOString()
     });
 
-    assert(braph instanceof Braph, true);
+    await post.save();
+
+    expect(post).toHaveProperty("_id");
+    expect(post).toHaveProperty("title", "A post");
+    expect(post).toHaveProperty("content", "Lorem ipsum dolor sit amet");
+    expect(post).toHaveProperty("creation_date");
+    expect(post).toHaveProperty("update_date");
+
+  });
+
+  it(`should read an instance of the Entity inherited class with ${DB_NAME} as a database`, async () => {
+
+    const post = new Post({
+      title: "A post",
+      content: "Lorem ipsum dolor sit amet",
+      creation_date: (new Date()).toISOString(),
+      update_date: new Date().toISOString()
+    });
+
+    await post.save();
+
+    const postRead = await Post.read(post.id);
+
+    expect(postRead).toHaveProperty("_id", post.id);
+    expect(postRead).toHaveProperty("title", post.title);
+    expect(postRead).toHaveProperty("content", post.content);
+    expect(postRead).toHaveProperty("creation_date", post.creation_date);
+    expect(postRead).toHaveProperty("update_date", post.update_date);
+
+  });
+
+  it(`should delete an instance of the Entity inherited class with ${DB_NAME} as a database`, async () => {
+
+    const post = new Post({
+      title: "A post",
+      content: "Lorem ipsum dolor sit amet",
+      creation_date: (new Date()).toISOString(),
+      update_date: new Date().toISOString()
+    });
+
+    await post.save();
+    expect(post).toHaveProperty("_id", post.id);
+
+    await Post.delete(post.id);
+    let postRead = await Post.read(post.id);
+    expect(postRead).toBeNull();
+
+  });
+
+  it(`should return a list of instances that fulfill a query to the Entity inherited class with ${DB_NAME} as a database`, async () => {
 
   });
 

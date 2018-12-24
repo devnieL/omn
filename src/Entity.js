@@ -87,7 +87,7 @@ class Entity {
     }
   }
 
-  /** INSTANCE PROPERTIES */
+  /** Instance properties */
 
   // Id
   set id(value) {
@@ -107,7 +107,7 @@ class Entity {
     this._properties = value;
   }
 
-  /** METHODS */
+  /** Instance methods */
 
   // Get properties
   getProperties() {
@@ -119,8 +119,6 @@ class Entity {
 
     return props;
   }
-
-
 
   // Set properties
   // TODO: Allow getter and setters.

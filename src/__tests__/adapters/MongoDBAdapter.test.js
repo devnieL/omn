@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
+import MongoDBAdapter from '../../adapters/mongodb/MongoDBAdapter';
 import Post from '../entities/Post.js';
+import DB from '../../DB';
 
 const DB_NAME = "MongoDB";
 
 describe("MongoDBAdapter", () => {
-
-  const DB = require("../../index.js").DB;
 
   beforeAll(async () => {
 
@@ -25,22 +25,15 @@ describe("MongoDBAdapter", () => {
 
   });
 
-  it(`should save an instance of Entity with ${DB_NAME} as a database`, async () => {
+  it(`should create an adapter for the provider class`, async () => {
 
-    const post = new Post({
-      title: "A post",
-      content: "Lorem ipsum dolor sit amet",
-      creation_date: (new Date()).toISOString(),
-      update_date: new Date().toISOString()
-    });
+    const adapter = MongoDBAdapter.create(Post);
+    console.log('adapter:', adapter);
 
-    await post.save();
-
-    expect(post).toHaveProperty("_id");
-    expect(post).toHaveProperty("title", "A post");
-    expect(post).toHaveProperty("content", "Lorem ipsum dolor sit amet");
-    expect(post).toHaveProperty("creation_date");
-    expect(post).toHaveProperty("update_date");
+    expect(adapter).not.toBeNull();
+    expect(adapter.instanceClass).toEqual(Post);
+    expect(adapter.originalSchema).toEqual(Post.schema);
+    expect(adapter.model).not.toBeNull();
 
   });
 
@@ -80,6 +73,10 @@ describe("MongoDBAdapter", () => {
     await Post.delete(post.id);
     let postRead = await Post.read(post.id);
     expect(postRead).toBeNull();
+
+  });
+
+  it(`should return a list of instances that fulfill a query to the Entity inherited class with ${DB_NAME} as a database`, async () => {
 
   });
 
