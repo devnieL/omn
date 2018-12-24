@@ -7,10 +7,10 @@ describe('EntityError', () => {
     var code = "ENTITY_NOT_FOUND";
     var error = new EntityError("Entity not found", code);
 
-    try{
-        throw error;
-    }catch(e){
-        assert.equal(e.code, code);
+    try {
+      throw error;
+    } catch (e) {
+      assert.equal(e.code, code);
     }
 
   });

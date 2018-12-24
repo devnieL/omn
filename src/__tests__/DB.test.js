@@ -8,7 +8,7 @@ describe('DB', () => {
     const DB = require("../index.js").DB;
 
     DB.configure({
-        db : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', 'neo4j'))
+      db : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', 'neo4j'))
     });
 
     const db = DB.getDB();
@@ -22,25 +22,25 @@ describe('DB', () => {
     const DB = require("../index.js").DB;
 
     DB.configure({
-        db : {
-            type : "neo4j",
-            client : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', 'neo4j'))
-        }
+      db : {
+        type : "neo4j",
+        client : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', 'neo4j'))
+      }
     });
 
     const db = DB.getDB();
     assert.equal(Entity, DB.Entity);
 
-  })
+  });
 
   it('should return the available models', () => {
 
     const DB = require("../index.js").DB;
 
     DB.configure({
-        db : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', 'neo4j'))
+      db : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', 'neo4j'))
     });
-    
+
     class Braph extends DB.Entity {}
     class Page extends DB.Entity {}
     class User extends DB.Entity {}
@@ -55,5 +55,6 @@ describe('DB', () => {
 
     assert.equal(Object.keys(DB.entities).length, 5);
 
-  })
+  });
+
 });

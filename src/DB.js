@@ -5,18 +5,18 @@
  */
 class DB {
 
-    static configure({ db }){
-        this.db = db;
-        this.entities = {};
-    }
+  static configure({ db }) {
+    this.db = db;
+    this.entities = {};
+  }
 
-    static getDB(){
-        return this.db;
-    }
+  static getDB() {
+    return this.db;
+  }
 
-    static get Entity(){
-        return require("./Entity");
-    }
+  static get Entity() {
+    return require("./Entity");
+  }
 
 }
 

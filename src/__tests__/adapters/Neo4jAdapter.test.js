@@ -4,132 +4,132 @@ var neo4j = require('neo4j-driver');
 
 xdescribe('Neo4jAdapter', () => {
 
-    const DB = require("../../index.js").DB;
-    const Entity = require('../../index.js').Entity;
+  const DB = require("../../index.js").DB;
+  const Entity = require('../../index.js').Entity;
 
-    beforeAll((done) => {
+  beforeAll((done) => {
 
-        DB.configure({
-            db : {
-                type : "neo4j",
-                client : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', '12345678'))
-            }
-        });
-        
-        done();
-    
+    DB.configure({
+      db : {
+        type : "neo4j",
+        client : neo4j.v1.driver('bolt://localhost', neo4j.v1.auth.basic('neo4j', '12345678'))
+      }
     });
 
-    it('should save an instance of Entity with Neo4j as a database', async () => {
+    done();
 
-        class Braph extends Entity {
-            static get schema(){
-                return {
-                    name : {
-                        type : String,
-                        null : false,
-                        default : "A new Braph"
-                    },
-                    active : Boolean,
-                    creation_date : Date,
-                    update_date : Date,
-                    global : Boolean
-                }
-            }
+  });
+
+  it('should save an instance of Entity with Neo4j as a database', async () => {
+
+    class Braph extends Entity {
+      static get schema(){
+        return {
+          name : {
+            type : String,
+            null : false,
+            default : "A new Braph"
+          },
+          active : Boolean,
+          creation_date : Date,
+          update_date : Date,
+          global : Boolean
         }
+      }
+    }
 
-        var braph = new Braph({
-            name : "An example",
-            active : true,
-            creation_date : (new Date()).toISOString(),
-            update_date : new Date().toISOString(),
-            global : true
-        });
-
-        await braph.save();
-
-        assert.notEqual(braph.id, null);
-
+    var braph = new Braph({
+      name : "An example",
+      active : true,
+      creation_date : (new Date()).toISOString(),
+      update_date : new Date().toISOString(),
+      global : true
     });
 
-    it('should read an instance of the Entity inherited class with Neo4j as a database', async () => {
+    await braph.save();
 
-        class Braph extends Entity {
-            static get schema(){
-                return {
-                    name : {
-                        type : String,
-                        null : false,
-                        default : "A new Braph"
-                    },
-                    active : Boolean,
-                    creation_date : Date,
-                    update_date : Date,
-                    global : Boolean
-                }
-            }
+    assert.notEqual(braph.id, null);
+
+  });
+
+  it('should read an instance of the Entity inherited class with Neo4j as a database', async () => {
+
+    class Braph extends Entity {
+      static get schema(){
+        return {
+          name : {
+            type : String,
+            null : false,
+            default : "A new Braph"
+          },
+          active : Boolean,
+          creation_date : Date,
+          update_date : Date,
+          global : Boolean
         }
+      }
+    }
 
-        var braph = new Braph({
-            name : "An example",
-            active : true,
-            creation_date : (new Date()).toISOString(),
-            update_date : new Date().toISOString(),
-            global : true
-        });
-
-        await braph.save();
-
-        assert.notEqual(braph.id, null);
-
-        var braph_read = await Braph.read(braph.id);
-        assert.equal(braph_read.id, braph.id);
-
+    var braph = new Braph({
+      name : "An example",
+      active : true,
+      creation_date : (new Date()).toISOString(),
+      update_date : new Date().toISOString(),
+      global : true
     });
 
-    xit('should update an instance the Entity inherited class with Neo4j as a database', async () => {
+    await braph.save();
 
-    });
+    assert.notEqual(braph.id, null);
 
-    it('should delete an instance of the Entity inherited class with Neo4j as a database', async () => {
+    var braph_read = await Braph.read(braph.id);
+    assert.equal(braph_read.id, braph.id);
 
-        class Braph extends Entity {
-            static get schema(){
-                return {
-                    name : {
-                        type : String,
-                        null : false,
-                        default : "A new Braph"
-                    },
-                    active : Boolean,
-                    creation_date : Date,
-                    update_date : Date,
-                    global : Boolean
-                }
-            }
+  });
+
+  xit('should update an instance the Entity inherited class with Neo4j as a database', async () => {
+
+  });
+
+  it('should delete an instance of the Entity inherited class with Neo4j as a database', async () => {
+
+    class Braph extends Entity {
+      static get schema(){
+        return {
+          name : {
+            type : String,
+            null : false,
+            default : "A new Braph"
+          },
+          active : Boolean,
+          creation_date : Date,
+          update_date : Date,
+          global : Boolean
         }
+      }
+    }
 
-        var braph = new Braph({
-            name : "An example",
-            active : true,
-            creation_date : (new Date()).toISOString(),
-            update_date : new Date().toISOString(),
-            global : true
-        });
-
-        await braph.save();
-
-        assert.notEqual(braph.id, null);
-
-        await Braph.delete(braph.id);
-
-        var braph_read = await Braph.read(braph.id);
-        assert.equal(braph_read, null);
-        
+    var braph = new Braph({
+      name : "An example",
+      active : true,
+      creation_date : (new Date()).toISOString(),
+      update_date : new Date().toISOString(),
+      global : true
     });
 
-    xit('should run a raw query using the Entity inherited class', async () => {
+    await braph.save();
 
-    });
-    
+    assert.notEqual(braph.id, null);
+
+    await Braph.delete(braph.id);
+
+    var braph_read = await Braph.read(braph.id);
+    assert.equal(braph_read, null);
+
+  });
+
+  xit('should run a raw query using the Entity inherited class', async () => {
+
+  });
+
 });

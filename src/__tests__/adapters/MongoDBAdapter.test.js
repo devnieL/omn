@@ -3,54 +3,54 @@ var mongoose = require('mongoose');
 const DB_NAME = "MongoDB";
 
 describe("MongoDBAdapter", () => {
-  
+
   const DB = require("../../index.js").DB;
   const Entity = require('../../index.js').Entity;
 
   class Post extends Entity {
-      static get schema(){
-          return {
-              title: {
-                  type : String,
-                  null : false,
-                  default : "Untitled"
-              },
-              content: String,
-              active : {
-                type : Boolean,
-                default : true
-              },
-              creation_date : Date,
-              update_date : Date
-          }
+    static get schema(){
+      return {
+        title: {
+            type : String,
+            null : false,
+            default : "Untitled"
+        },
+        content: String,
+        active : {
+          type : Boolean,
+          default : true
+        },
+        creation_date : Date,
+        update_date : Date
       }
+    }
   }
 
   beforeAll(async () => {
 
-      DB.configure({
-          db : {
-              type : "mongodb",
-              client : await mongoose.connect("mongodb://localhost:27017/omn", {
-                  autoReconnect: true,
-                  socketTimeoutMS: 300000,
-                  connectTimeoutMS: 300000,
-                  keepAlive: true,
-                  reconnectTries: 30,
-                  reconnectInterval: 3000,
-              })
-          }
-      });
-          
+    DB.configure({
+      db : {
+        type : "mongodb",
+        client : await mongoose.connect("mongodb://localhost:27017/omn", {
+          autoReconnect: true,
+          socketTimeoutMS: 300000,
+          connectTimeoutMS: 300000,
+          keepAlive: true,
+          reconnectTries: 30,
+          reconnectInterval: 3000,
+        })
+      }
+    });
+
   });
 
   it(`should save an instance of Entity with ${DB_NAME} as a database`, async () => {
 
     const post = new Post({
-        title: "A post",
-        content: "Lorem ipsum dolor sit amet",
-        creation_date: (new Date()).toISOString(),
-        update_date: new Date().toISOString()
+      title: "A post",
+      content: "Lorem ipsum dolor sit amet",
+      creation_date: (new Date()).toISOString(),
+      update_date: new Date().toISOString()
     });
 
     await post.save();
@@ -99,7 +99,7 @@ describe("MongoDBAdapter", () => {
     await Post.delete(post.id);
     let postRead = await Post.read(post.id);
     expect(postRead).toBeNull();
-    
+
   });
-  
+
 });
