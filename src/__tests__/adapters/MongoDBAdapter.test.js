@@ -1,37 +1,18 @@
-var mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import Post from '../entities/Post.js';
 
 const DB_NAME = "MongoDB";
 
 describe("MongoDBAdapter", () => {
 
   const DB = require("../../index.js").DB;
-  const Entity = require('../../index.js').Entity;
-
-  class Post extends Entity {
-    static get schema(){
-      return {
-        title: {
-            type : String,
-            null : false,
-            default : "Untitled"
-        },
-        content: String,
-        active : {
-          type : Boolean,
-          default : true
-        },
-        creation_date : Date,
-        update_date : Date
-      }
-    }
-  }
 
   beforeAll(async () => {
 
     DB.configure({
-      db : {
-        type : "mongodb",
-        client : await mongoose.connect("mongodb://localhost:27017/omn", {
+      db: {
+        type: "mongodb",
+        client: await mongoose.connect("mongodb://localhost:27017/omn", {
           autoReconnect: true,
           socketTimeoutMS: 300000,
           connectTimeoutMS: 300000,
