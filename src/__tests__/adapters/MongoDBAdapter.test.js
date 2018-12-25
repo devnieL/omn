@@ -1,15 +1,14 @@
 import mongoose from 'mongoose';
 import MongoDBAdapter from '../../adapters/mongodb/MongoDBAdapter';
-import Post from '../entities/Post.js';
 import DB from '../../DB';
+import Entity from '../../Entity';
 
 const DB_NAME = "MongoDB";
 
 describe("MongoDBAdapter", () => {
 
-  beforeAll(async () => {
-
-    DB.configure({
+  const setDB = async () => {
+    await DB.configure({
       db: {
         type: "mongodb",
         client: await mongoose.connect("mongodb://localhost:27017/omn", {
@@ -22,61 +21,160 @@ describe("MongoDBAdapter", () => {
         })
       }
     });
+  }
+
+  const unsetDB = async () => {
+    DB.configure({
+      db: null
+    });
+  }
+
+  beforeAll(async () => {
+
+   await setDB();
 
   });
 
-  it(`should create an adapter for the provider class`, async () => {
+  describe("#create()", async () => {
 
-    const adapter = MongoDBAdapter.create(Post);
-    console.log('adapter:', adapter);
+    it(`should create an adapter for the provider class`, async () => {
 
-    expect(adapter).not.toBeNull();
-    expect(adapter.instanceClass).toEqual(Post);
-    expect(adapter.originalSchema).toEqual(Post.schema);
-    expect(adapter.model).not.toBeNull();
+      class Post extends Entity {}
 
-  });
+      const adapter = MongoDBAdapter.create(Post);
 
-  it(`should read an instance of the Entity inherited class with ${DB_NAME} as a database`, async () => {
+      expect(adapter).not.toBeNull();
+      expect(adapter.instanceClass).toEqual(Post);
+      expect(adapter.originalSchema).toEqual(Post.schema);
+      expect(adapter.model).not.toBeNull();
 
-    const post = new Post({
-      title: "A post",
-      content: "Lorem ipsum dolor sit amet",
-      creation_date: (new Date()).toISOString(),
-      update_date: new Date().toISOString()
     });
 
-    await post.save();
+    it(`should return an error if the DB hasn't been configured`,  async () => {
 
-    const postRead = await Post.read(post.id);
+      unsetDB();
 
-    expect(postRead).toHaveProperty("_id", post.id);
-    expect(postRead).toHaveProperty("title", post.title);
-    expect(postRead).toHaveProperty("content", post.content);
-    expect(postRead).toHaveProperty("creation_date", post.creation_date);
-    expect(postRead).toHaveProperty("update_date", post.update_date);
+      class Post extends Entity {}
+      expect(() => {
+        MongoDBAdapter.create(Post)
+      }).toThrowError("To get or create a model, a db needs to be configured.");
 
-  });
-
-  it(`should delete an instance of the Entity inherited class with ${DB_NAME} as a database`, async () => {
-
-    const post = new Post({
-      title: "A post",
-      content: "Lorem ipsum dolor sit amet",
-      creation_date: (new Date()).toISOString(),
-      update_date: new Date().toISOString()
     });
 
-    await post.save();
-    expect(post).toHaveProperty("_id", post.id);
-
-    await Post.delete(post.id);
-    let postRead = await Post.read(post.id);
-    expect(postRead).toBeNull();
-
   });
 
-  it(`should return a list of instances that fulfill a query to the Entity inherited class with ${DB_NAME} as a database`, async () => {
+  describe("#createSchema()", async () => {
+
+    it(`should create a mongoose schema based on the provided class inherited from Entity`, async () => {
+
+      await setDB();
+
+      const collection_name = 'Post';
+      class Post extends Entity {}
+      const schema = MongoDBAdapter.createSchema(Post, collection_name);
+      expect(schema).toBeInstanceOf(mongoose.Schema);
+      expect(schema.options.collection).toBe(collection_name);
+
+    });
+
+    it(`should return error if the provided Entity class have an 'schema' property that is not an object`, async () => {
+
+      await setDB();
+
+      const collection_name = 'Post';
+      class Post1 extends Entity {
+        static schema = 'test';
+      }
+
+      expect(() => {
+        const schema = MongoDBAdapter.createSchema(Post1, collection_name);
+      }).toThrowError('The schema property value of the entity class should be an object');
+
+      class Post2 extends Entity {
+        static schema = 1;
+      }
+
+      expect(() => {
+        const schema = MongoDBAdapter.createSchema(Post2, collection_name);
+      }).toThrowError('The schema property value of the entity class should be an object');
+
+      class Post3 extends Entity {
+        static schema = () => {};
+      }
+
+      expect(() => {
+        const schema = MongoDBAdapter.createSchema(Post3, collection_name);
+      }).toThrowError('The schema property value of the entity class should be an object');
+
+    });
+
+    it(`should return error if there is no collection name provided`, async () => {
+      expect(() => {
+        class Post extends Entity {}
+        const schema = MongoDBAdapter.createSchema(Post);
+      }).toThrowError('A collection name is required');
+    });
+
+    it(`should return error if there is no Entity class provided`, async () => {
+      expect(() => {
+        const schema = MongoDBAdapter.createSchema();
+      }).toThrowError('A class inherited from Entity is required.');
+    });
+
+    it(`should create a mongoose schema that complies with the provided schema types`, async () => {
+
+      class Author extends Entity {
+        static schema = {
+          name: String
+        }
+      }
+
+      class Comment extends Entity {
+        static schema = {
+          content: String
+        }
+      }
+
+      const schema = {
+        title: String,
+        date: Date,
+        views: Number,
+        author: Author,
+        metadata: Object,
+        tags: [String],
+        comments: [Comment],
+        updates: [Date],
+        versions: [Number],
+        annotations: [Object]
+      }
+
+      class Post extends Entity {
+        static schema = schema;
+      }
+
+      const mongooseSchema = MongoDBAdapter.createSchema(Post, Post.name);
+
+      console.log('Schema:', mongooseSchema);
+      console.log('Schema:', mongooseSchema.title);
+
+      // mongoose converts the type to its string representation.
+      expect(schema.title.name).toBe(mongooseSchema.obj.title.type);
+      expect(schema.date.name).toBe(mongooseSchema.obj.date.type);
+      expect(schema.views.name).toBe(mongooseSchema.obj.views.type);
+      expect(schema.metadata.name).toBe(mongooseSchema.obj.metadata.type);
+      expect(schema.tags[0].name).toBe(mongooseSchema.obj.tags[0].type);
+      expect(schema.updates[0].name).toBe(mongooseSchema.obj.updates[0].type);
+      expect(schema.versions[0].name).toBe(mongooseSchema.obj.versions[0].type);
+      expect(schema.annotations[0].name).toBe(mongooseSchema.obj.annotations[0].type);
+
+      // different treatment for properties that refers to classes
+      expect(mongooseSchema.obj.author.type.name).toBe('ObjectId');
+      expect(mongooseSchema.obj.comments[0].type.name).toBe('ObjectId');
+
+      expect(schema.author.name).toBe(mongooseSchema.obj.author.ref);
+      expect(schema.comments[0].name).toBe(mongooseSchema.obj.comments[0].ref);
+
+    });
 
   });
 

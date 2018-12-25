@@ -19,7 +19,7 @@ class MongoDBAdapter {
 
     if (instance_class.db) {
       if (instance_class.db.type != "mongodb")
-        throw new Error("To use a MongoDBAdapter, a MongoDB db connection should be set");
+        throw new Error("To use a MongoDBAdapter, a MongoDB db connection should be set.");
     }
 
     adapter.instanceClass = instance_class;
@@ -36,7 +36,16 @@ class MongoDBAdapter {
       collection
     }, "createSchema");
 
+    if(instance_class == null)
+      throw new Error('A class inherited from Entity is required.');
+
+    if(collection == null)
+      throw new Error('A collection name is required');
+
     var parsed_schema = {};
+
+    if(instance_class.schema != null && typeof instance_class.schema !== 'object')
+      throw new Error('The schema property value of the entity class should be an object');
 
     // Parse schema for MongoDB
     for (let i in instance_class.schema) {
@@ -120,7 +129,11 @@ class MongoDBAdapter {
   static getOrCreateModel(instance_class, schema) {
 
     if (typeof instance_class != "function")
-      throw new Error("To get or create a model, a class is necessary as parameter");
+      throw new Error("To get or create a model, a class is necessary as parameter.");
+
+    if (!DB || !DB.getDB()){
+      throw new Error("To get or create a model, a db needs to be configured.");
+    }
 
     let _log = log.child({
       parameters: { instance_class },

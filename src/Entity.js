@@ -1,7 +1,7 @@
-const DB = require("./DB");
-const MongoDBAdapter = require("./adapters/mongodb/MongoDBAdapter");
-const PostgreSQLAdapter = require("./adapters/postgresql/PostgreSQLAdapter");
-const Neo4jAdapter = require("./adapters/neo4j/Neo4jAdapter");
+import DB from './DB';
+import MongoDBAdapter from './adapters/mongodb/MongoDBAdapter';
+import PostgreSQLAdapter from './adapters/postgresql/PostgreSQLAdapter';
+import Neo4jAdapter from './adapters/neo4j/Neo4jAdapter';
 
 const Utils = require("./utils/Utils");
 
